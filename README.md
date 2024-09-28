@@ -13,7 +13,7 @@ Option+Click(Alt+Click) a component in your browser to instantly open the source
 
 ## Install
 
-1. Open [Click To Component - Chrome Web Store](TODO);
+1. Open [Click To Component - Chrome Web Store](https://chromewebstore.google.com/detail/hdiiegojkjkgaakbdjpoaaadhnddpfdc);
 2. Click `Add to Chrome`;
 
 You can config `Site access` to `On Click` or `On specific sites` for this extension to control click-to-component script inject.

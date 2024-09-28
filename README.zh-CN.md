@@ -13,7 +13,7 @@
 
 ## 安装
 
-1. 打开链接 [Click To Component - Chrome Web Store](TODO)；
+1. 打开链接 [Click To Component - Chrome Web Store](https://chromewebstore.google.com/detail/hdiiegojkjkgaakbdjpoaaadhnddpfdc)；
 2. 点击 `添加至 Chrome`。
 
 你可以将此扩展的“站点访问”配置为“点击时”或“特定站点”，以控制点击组件的脚本注入。
