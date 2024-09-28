@@ -1,0 +1,31 @@
+{
+  "name": "click-to-component-browser-extension",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Option+Click(Alt+Click) a component in your browser to instantly open the source in VS Code.",
+  "homepage": "https://github.com/zjffun/click-to-component-browser-extension#readme",
+  "bugs": {
+    "url": "https://github.com/zjffun/click-to-component-browser-extension/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zjffun/click-to-component-browser-extension.git"
+  },
+  "publisher": "zjffun",
+  "scripts": {
+    "zip": "git archive --format=zip --output=./click-to-component-browser-extension.zip HEAD",
+    "eslint-fix": "eslint --fix .",
+    "prettier-fix": "prettier --write .",
+    "sort-package-json": "sort-package-json"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^1.1.1",
+    "eslint": "^9.9.1",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "3.3.3"
+  },
+  "packageManager": "yarn@1.22.22",
+  "engines": {
+    "node": ">=18"
+  }
+}
