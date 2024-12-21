@@ -313,7 +313,11 @@ function initPopover() {
             cleanTarget();
           });
           buttonEl.innerHTML = `<code class="${popoverName}__list__item__local-name">&lt;${item?.el?.localName || unknownComponentName}&gt;</code>
-<cite class="${popoverName}__list__item__source-code-location">${sourceCodeLocationStr.replace(/.*(src|pages)/, '$1')}</cite>`;
+<cite class="${popoverName}__list__item__source-code-location">
+  <span dir="ltr">
+    ${sourceCodeLocationStr.replace(/.*(src|pages)/, '$1')}
+  </span>
+</cite>`;
 
           itemEL.appendChild(buttonEl);
 
@@ -396,6 +400,12 @@ button {
   }
 
   cite {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    /* text-overflow ellipsis on left sida. Inner span element set dir="ltr" */
+    direction: rtl;
     font-weight: normal;
     font-style: normal;
     font-size: 12px;
@@ -420,12 +430,14 @@ button {
 }
 
 ${popoverName} {
+  inset: unset;
   position: fixed;
   position-anchor: --${anchorName};
-  position-area: bottom;
-  position-try-fallbacks: flip-block;
-  position-try-order: most-height;
-
+  top: anchor(bottom);
+  justify-self: anchor-center;
+  position-try: most-height flip-block;
+  box-sizing: border-box;
+  max-width: 100%;
   margin: 0;
 }
 </style>
