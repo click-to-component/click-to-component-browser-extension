@@ -5,6 +5,7 @@
   "version": "0.0.0.2",
   "manifest_version": 3,
   "action": {
+    "default_popup": "popup/index.html",
     "default_icon": {
       "128": "images/icon128.png"
     }
@@ -16,7 +17,11 @@
       "all_frames": true
     }
   ],
-  "permissions": [],
+  "background": {
+    "service_worker": "background/index.js"
+  },
+  "permissions": ["scripting", "activeTab", "storage"],
+  "optional_host_permissions": ["<all_urls>"],
   "web_accessible_resources": [
     {
       "matches": ["<all_urls>"],

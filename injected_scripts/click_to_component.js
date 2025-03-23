@@ -2,7 +2,7 @@ const baseName = "click-to-component-browser-extension";
 const targetName = `${baseName}-target`;
 const unknownComponentName = "Unknown Component";
 
-console.warn(`[${baseName}] enabled`);
+console.log(`[${baseName}] enabled`);
 
 // this funciton will update after popover is defined
 let hidePopover = function () {};
@@ -129,15 +129,40 @@ function getElWithSourceCodeLocation(el) {
   }
 }
 
+function getUrlByConfig(sourceCodeLocationStr) {
+  const config = window.__CLICK_TO_COMPONENT_BROWSER_EXTENSION_CONFIG__;
+  const configReplacements = config?.replacements;
+
+  if (Array.isArray(configReplacements)) {
+    let result = sourceCodeLocationStr;
+
+    for (const configReplacement of configReplacements) {
+      const { isRegExp, pattern, replacement } = configReplacement;
+
+      if (isRegExp) {
+        const regexp = new RegExp(pattern);
+        result = result.replace(regexp, replacement);
+      } else {
+        result = result.replace(pattern, replacement);
+      }
+    }
+
+    return result;
+  }
+
+  // Default VSCode
+  if (sourceCodeLocationStr.startsWith("/")) {
+    return `vscode://file${sourceCodeLocationStr}`;
+  }
+
+  return `vscode://file/${sourceCodeLocationStr}`;
+}
+
 function openEditor(sourceCodeLocationStr) {
   // __CLICK_TO_COMPONENT_URL_FUNCTION__ can be async
   const urlPromise = Promise.resolve().then(() => {
     if (typeof window.__CLICK_TO_COMPONENT_URL_FUNCTION__ !== "function") {
-      if (sourceCodeLocationStr.startsWith("/")) {
-        return `vscode://file${sourceCodeLocationStr}`;
-      }
-
-      return `vscode://file/${sourceCodeLocationStr}`;
+      return getUrlByConfig(sourceCodeLocationStr);
     }
 
     return window.__CLICK_TO_COMPONENT_URL_FUNCTION__(sourceCodeLocationStr);
@@ -315,7 +340,7 @@ function initPopover() {
           buttonEl.innerHTML = `<code class="${popoverName}__list__item__local-name">&lt;${item?.el?.localName || unknownComponentName}&gt;</code>
 <cite class="${popoverName}__list__item__source-code-location">
   <span dir="ltr">
-    ${sourceCodeLocationStr.replace(/.*(src|pages)/, '$1')}
+    ${sourceCodeLocationStr.replace(/.*(src|pages)/, "$1")}
   </span>
 </cite>`;
 
@@ -465,7 +490,9 @@ ${popoverName} {
 
         cleanAndSetAnchor(el);
 
-        vueClickToComponentPopoverEl.updateComponentInfoList(elListWithSourceCodeLocationList);
+        vueClickToComponentPopoverEl.updateComponentInfoList(
+          elListWithSourceCodeLocationList,
+        );
 
         vueClickToComponentPopoverEl.showPopover();
         document.activeElement.blur();

@@ -1,0 +1,268 @@
+@import url("../assets/fontawesome-free-6.6.0-web/css/fontawesome.css");
+@import url("../assets/fontawesome-free-6.6.0-web/css/brands.css");
+@import url("../assets/fontawesome-free-6.6.0-web/css/solid.css");
+
+:root {
+  --red-50: #ffebee;
+  --red-100: #ffcdd2;
+  --red-200: #ef9a9a;
+  --red-300: #e57373;
+  --red-400: #ef5350;
+  --red-500: #f44336;
+  --red-600: #e53935;
+  --red-700: #d32f2f;
+  --red-800: #c62828;
+  --red-900: #b71c1c;
+  --green-50: #e8f5e9;
+  --green-100: #c8e6c9;
+  --green-200: #a5d6a7;
+  --green-300: #81c784;
+  --green-400: #66bb6a;
+  --green-500: #4caf50;
+  --green-600: #43a047;
+  --green-700: #388e3c;
+  --green-800: #2e7d32;
+  --green-900: #1b5e20;
+  --blue-50: #e3f2fd;
+  --blue-100: #bbdefb;
+  --blue-200: #90caf9;
+  --blue-300: #64b5f6;
+  --blue-400: #42a5f5;
+  --blue-500: #2196f3;
+  --blue-600: #1e88e5;
+  --blue-700: #1976d2;
+  --blue-800: #1565c0;
+  --blue-900: #0d47a1;
+  --yellow-50: #fffde7;
+  --yellow-100: #fff9c4;
+  --yellow-200: #fff59d;
+  --yellow-300: #fff176;
+  --yellow-400: #ffee58;
+  --yellow-500: #ffeb3b;
+  --yellow-600: #fdd835;
+  --yellow-700: #fbc02d;
+  --yellow-800: #f9a825;
+  --yellow-900: #f57f17;
+  --grey-50: #fafafa;
+  --grey-100: #f5f5f5;
+  --grey-200: #eeeeee;
+  --grey-300: #e0e0e0;
+  --grey-400: #bdbdbd;
+  --grey-500: #9e9e9e;
+  --grey-600: #757575;
+  --grey-700: #616161;
+  --grey-800: #424242;
+  --grey-900: #212121;
+
+  --grey-0: #fff;
+  --grey-900-raw: 21, 21, 21;
+
+  --primary-color: var(--blue-500);
+  --border-color: var(--grey-300);
+}
+
+* {
+  box-sizing: border-box;
+
+  &[hidden] {
+    display: none !important;
+  }
+}
+
+h4,
+p {
+  margin: 0;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &.disabled {
+    color: var(--grey-500);
+    cursor: not-allowed;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+button {
+  font-size: 1rem;
+}
+
+input,
+textarea {
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  line-height: 1.5rem;
+  outline: none;
+  padding: 0.25rem 0.5rem;
+
+  &:not(:disabled) {
+    &:hover,
+    &:focus,
+    &:active {
+      border-color: var(--primary-color);
+    }
+  }
+
+  &[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+  }
+}
+
+hr {
+  margin: 0;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.text-button {
+  border-radius: 6px;
+  padding: 0 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--grey-600);
+  font-weight: bold;
+  min-width: max-content;
+  line-height: 1.6;
+
+  &:hover {
+    background: rgba(var(--grey-900-raw), 0.1);
+  }
+
+  i {
+    font-size: 1em;
+    width: 1em;
+    height: 1em;
+  }
+}
+
+.text-button--danger {
+  color: var(--red-400);
+}
+
+.text-button--primary {
+  color: var(--blue-400);
+}
+
+.button {
+  color: var(--grey-900);
+  background: var(--grey-0);
+  border: 1px solid var(--grey-300);
+  border-radius: 0.25rem;
+  padding: 0.25rem 1rem;
+  cursor: pointer;
+  width: max-content;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--grey-100);
+  }
+
+  &:active {
+    background: var(--grey-200);
+  }
+}
+
+.button--danger {
+  color: var(--grey-0);
+  background: var(--red-400);
+  border: 1px solid var(--red-400);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--red-300);
+    border-color: var(--red-300);
+  }
+
+  &:active {
+    background: var(--red-500);
+    border-color: var(--red-500);
+  }
+}
+
+.button--primary {
+  color: var(--grey-0);
+  background: var(--blue-400);
+  border: 1px solid var(--blue-400);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--blue-300);
+    border-color: var(--blue-300);
+  }
+
+  &:active {
+    background: var(--blue-500);
+    border-color: var(--blue-500);
+  }
+}
+
+.button--outlined-primary {
+  background-color: transparent;
+  border-color: var(--blue-600);
+  color: var(--blue-600);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--blue-100);
+  }
+
+  &:active {
+    background: var(--blue-200);
+  }
+}
+
+.button--outlined-danger {
+  background-color: transparent;
+  border-color: var(--red-400);
+  color: var(--red-400);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--red-100);
+  }
+
+  &:active {
+    background: var(--red-200);
+  }
+}
+
+.aux-title {
+  font-weight: bold;
+}
+
+.flex-auto-shrink-label {
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.button-container {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.content-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}

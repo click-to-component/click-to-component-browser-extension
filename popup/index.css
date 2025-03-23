@@ -1,0 +1,60 @@
+@import url("./common/base.css");
+
+html {
+  font-size: 14px;
+}
+
+body {
+  color: var(--grey-900);
+  font-family:
+    "General Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol";
+  font-size: 14px;
+  line-height: 22px;
+  margin: 0;
+}
+
+::backdrop {
+  --bg-mask: rgba(0, 0, 0, 0.55);
+  background-image: var(--bg-mask);
+}
+
+.container {
+  min-width: 500px;
+  min-height: 500px;
+}
+
+.dialog {
+  border: none;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  width: calc(100% - 2rem);
+  max-width: 360px;
+}
+
+.message-popover {
+  all: unset;
+  margin: 3rem auto 0 auto;
+  position: fixed;
+  inset: 0;
+  width: fit-content;
+  height: fit-content;
+  word-break: break-word;
+}
+
+.confirm-dialog {
+  border: none;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  width: calc(100% - 2rem);
+  max-width: 360px;
+}
