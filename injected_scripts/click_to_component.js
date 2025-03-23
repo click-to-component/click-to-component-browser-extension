@@ -301,6 +301,17 @@ function initPopover() {
     return elWithSourceCodeLocationList;
   }
 
+  if (customElements.get("vue-click-to-component-popover")) {
+    console.warn(
+      `[${baseName}] you can remove \`import 'vue-click-to-component/client';\` in your project when you are using Click To Component extension.`,
+    );
+  }
+
+  if (customElements.get(popoverName)) {
+    console.warn(`[${baseName}] ${popoverName} is already defined.`);
+    return;
+  }
+
   customElements.define(
     popoverName,
     class extends HTMLElement {

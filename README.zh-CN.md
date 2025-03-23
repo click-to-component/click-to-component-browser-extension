@@ -1,4 +1,4 @@
-# click-to-component-browser-extension
+# [click-to-component-browser-extension](https://chromewebstore.google.com/detail/click-to-component/hdiiegojkjkgaakbdjpoaaadhnddpfdc)
 
 [English](./README.md) | 简体中文
 
