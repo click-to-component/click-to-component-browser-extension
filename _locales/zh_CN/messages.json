@@ -1,5 +1,5 @@
 {
   "description": {
-    "message": "在浏览器中按住 Option(Alt) 点击组件，立即在编辑器中打开对应代码。"
+    "message": "在浏览器中按住 Option(Alt) 点击组件，立即在编辑器中打开对应代码。支持自定义配置打开 WebStorm、Cursor、GitHub 等。"
   }
 }

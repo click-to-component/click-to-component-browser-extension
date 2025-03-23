@@ -13,6 +13,7 @@
   },
   "publisher": "zjffun",
   "scripts": {
+    "update-ewc": "wget -O ./popup/common/easyWebComponent.js https://cdn.jsdelivr.net/npm/easy-web-component@0.0.1/index.js",
     "zip": "git archive --format=zip --output=./click-to-component-browser-extension.zip HEAD",
     "eslint-fix": "eslint --fix .",
     "prettier-fix": "prettier --write .",

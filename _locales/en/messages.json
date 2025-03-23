@@ -1,5 +1,5 @@
 {
   "description": {
-    "message": "Option+Click(Alt+Click) a component in your browser to instantly open the source in VS Code."
+    "message": "Option+Click(Alt+Click) a component in your browser to instantly open the source in VS Code. Support custom config open WebStorm, Cursor, GitHub, etc."
   }
 }
