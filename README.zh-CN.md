@@ -14,6 +14,18 @@
    - React 使用 [babel-plugin-transform-react-jsx-data-source-code-location](https://www.npmjs.com/package/babel-plugin-transform-react-jsx-data-source-code-location) 生成。
 5. 支持 React `__source` (由 [@babel/plugin-transform-react-jsx-source](https://babeljs.io/docs/babel-plugin-transform-react-jsx-source) 生成)。
 
+### React 点击组件打开代码
+
+![react](./images/react.jpg)
+
+### Vue 点击组件打开代码
+
+![vue](./images/vue.jpg)
+
+### 自定义打开的编辑器或者 URL
+
+![config](./images/config.jpg)
+
 ## 安装
 
 1. 打开链接 [Click To Component - Chrome Web Store](https://chromewebstore.google.com/detail/hdiiegojkjkgaakbdjpoaaadhnddpfdc)；
