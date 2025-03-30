@@ -52,10 +52,10 @@ async function injectConfig() {
       target: { tabId },
       args: [serializableConfig],
       func: (value) => {
-        window.__CLICK_TO_COMPONENT_BROWSER_EXTENSION_CONFIG__ = value;
+        window.__CLICK_TO_COMPONENT_CONFIG__ = value;
         console.log(
           "[click-to-component-browser-extension config]",
-          window.__CLICK_TO_COMPONENT_BROWSER_EXTENSION_CONFIG__,
+          window.__CLICK_TO_COMPONENT_CONFIG__,
         );
       },
       world: "MAIN",

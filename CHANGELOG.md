@@ -1,3 +1,7 @@
+# v0.0.0.4
+
+- Using module script.
+
 # v0.0.0.3
 
 - Support custom config open WebStorm, Cursor, GitHub,etc.

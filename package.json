@@ -14,6 +14,7 @@
   "publisher": "zjffun",
   "scripts": {
     "update-ewc": "wget -O ./popup/common/easyWebComponent.js https://cdn.jsdelivr.net/npm/easy-web-component@0.0.1/index.js",
+    "update-click-to-component-browser": "wget -O ./injected_scripts/click_to_component.js https://cdn.jsdelivr.net/npm/click-to-component-browser@0.1.3/index.js",
     "zip": "git archive --format=zip --output=./click-to-component-browser-extension.zip HEAD",
     "eslint-fix": "eslint --fix .",
     "prettier-fix": "prettier --write .",

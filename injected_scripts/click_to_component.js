@@ -1,8 +1,7 @@
-const baseName = "click-to-component-browser-extension";
+const baseName = "click-to-component-browser";
+const version = "0.1.3";
 const targetName = `${baseName}-target`;
 const unknownComponentName = "Unknown Component";
-
-console.log(`[${baseName}] enabled`);
 
 // this funciton will update after popover is defined
 let hidePopover = function () {};
@@ -92,7 +91,6 @@ function getSourceCodeLocationString(sourceCodeLocation) {
 }
 
 function getElSourceCodeLocation(el) {
-  // __sourceCodeLocation (vue-click-to-component)
   const dataSourceCodeLocationStr = el?.dataset?.__sourceCodeLocation;
   if (dataSourceCodeLocationStr) {
     const sourceCodeLocation = parseSourceCodeLocation(
@@ -130,7 +128,7 @@ function getElWithSourceCodeLocation(el) {
 }
 
 function getUrlByConfig(sourceCodeLocationStr) {
-  const config = window.__CLICK_TO_COMPONENT_BROWSER_EXTENSION_CONFIG__;
+  const config = window.__CLICK_TO_COMPONENT_CONFIG__;
   const configReplacements = config?.replacements;
 
   if (Array.isArray(configReplacements)) {
@@ -210,7 +208,7 @@ function initAltClick() {
     outline: var(--${baseName}-outline, 1px auto -webkit-focus-ring-color) !important;
   }
 }`.trim();
-  document.documentElement.appendChild(style);
+  document.head.appendChild(style);
 
   window.addEventListener(
     "click",
@@ -301,6 +299,47 @@ function initPopover() {
     return elWithSourceCodeLocationList;
   }
 
+  function getPopoverEl() {
+    const popoverStyleElKey = `${popoverName}-style`;
+    const popoverStyleEl = document.querySelector(
+      `[key='${popoverStyleElKey}']`,
+    );
+    if (!popoverStyleEl) {
+      const styleEl = document.createElement("style");
+      styleEl.setAttribute("type", "text/css");
+      styleEl.setAttribute("key", popoverStyleElKey);
+      styleEl.textContent = `[${anchorName}] {
+    anchor-name: --${anchorName};
+  }
+
+  ${popoverName} {
+    inset: unset;
+    position: fixed;
+    position-anchor: --${anchorName};
+    top: anchor(bottom);
+    justify-self: anchor-center;
+    position-try: most-height flip-block;
+    box-sizing: border-box;
+    max-width: 100%;
+    margin: 0;
+    border: 1.5px solid currentColor;
+  }`;
+      document.head.appendChild(styleEl);
+    }
+
+    const popoverEl = document.querySelector(popoverName);
+
+    if (popoverEl) {
+      return popoverEl;
+    }
+
+    const newPopoverEl = document.createElement(popoverName);
+    newPopoverEl.setAttribute("popover", "manual");
+    document.body.appendChild(newPopoverEl);
+
+    return newPopoverEl;
+  }
+
   if (customElements.get("vue-click-to-component-popover")) {
     console.warn(
       `[${baseName}] you can remove \`import 'vue-click-to-component/client';\` in your project when you are using Click To Component extension.`,
@@ -322,6 +361,8 @@ function initPopover() {
       constructor() {
         super();
 
+        this.shadow = this.attachShadow({ mode: "open" });
+        this.listEl = null;
         this.componentInfoList = [];
 
         this.setStyle();
@@ -388,7 +429,7 @@ function initPopover() {
         formEl.appendChild(listEl);
         this.listEl = listEl;
 
-        this.appendChild(formEl);
+        this.shadow.appendChild(formEl);
       }
 
       setStyle() {
@@ -452,35 +493,12 @@ button {
 }
 }`;
 
-        this.appendChild(styleEl);
+        this.shadow.appendChild(styleEl);
       }
     },
   );
 
-  document.body.insertAdjacentHTML(
-    "beforeend",
-    `
-<style type="text/css" key="${popoverName}-style">
-[${anchorName}] {
-  anchor-name: --${anchorName};
-}
-
-${popoverName} {
-  inset: unset;
-  position: fixed;
-  position-anchor: --${anchorName};
-  top: anchor(bottom);
-  justify-self: anchor-center;
-  position-try: most-height flip-block;
-  box-sizing: border-box;
-  max-width: 100%;
-  margin: 0;
-}
-</style>
-<${popoverName} popover="manual"></${popoverName}>`,
-  );
-
-  const vueClickToComponentPopoverEl = document.querySelector(popoverName);
+  let currentPopoverEl;
 
   window.addEventListener(
     "contextmenu",
@@ -489,6 +507,9 @@ ${popoverName} {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
+
+        const popoverEl = getPopoverEl();
+        currentPopoverEl = popoverEl;
 
         const elListWithSourceCodeLocationList =
           getElListWithSourceCodeLocation(e.target);
@@ -501,11 +522,9 @@ ${popoverName} {
 
         cleanAndSetAnchor(el);
 
-        vueClickToComponentPopoverEl.updateComponentInfoList(
-          elListWithSourceCodeLocationList,
-        );
+        popoverEl.updateComponentInfoList(elListWithSourceCodeLocationList);
 
-        vueClickToComponentPopoverEl.showPopover();
+        popoverEl.showPopover();
         document.activeElement.blur();
       }
     },
@@ -513,18 +532,32 @@ ${popoverName} {
   );
 
   hidePopover = function () {
-    vueClickToComponentPopoverEl.hidePopover();
+    currentPopoverEl?.hidePopover?.();
   };
 }
 
-try {
-  initAltClick();
-} catch (error) {
-  console.warn(`[${baseName}] init failed`, error);
+function init() {
+  if (window.__CLICK_TO_COMPONENT_INIT__) {
+    return;
+  }
+
+  console.log(`[${baseName}] enabled`, { version });
+
+  try {
+    initAltClick();
+  } catch (error) {
+    console.warn(`[${baseName}] init failed`, error);
+  }
+
+  try {
+    initPopover();
+  } catch (error) {
+    console.warn(`[${baseName}] init popover failed`, error);
+  }
+
+  window.__CLICK_TO_COMPONENT_INIT__ = true;
 }
 
-try {
-  initPopover();
-} catch (error) {
-  console.warn(`[${baseName}] init popover failed`, error);
-}
+init();
+
+export { version };
