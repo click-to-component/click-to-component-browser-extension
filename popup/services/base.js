@@ -23,27 +23,39 @@ function createBaseService({ storageKey }) {
     onChangeListeners = onChangeListeners.filter((item) => item !== fn);
   }
 
+  async function getData() {
+    const result = await chrome?.storage?.local?.get([storageKey]);
+    const data = result?.[storageKey];
+    return data;
+  }
+
+  async function setData(data) {
+    await chrome?.storage?.local?.set({
+      [storageKey]: data,
+    });
+  }
+
   return {
     addOnChangeListener,
     removeOnChangeListener,
+    getData,
+    setData,
   };
 }
 
 function createBaseListService({ storageKey }) {
-  if (!storageKey) {
-    throw new Error("storageKey is required");
-  }
+  const baseService = createBaseService({
+    storageKey,
+  });
 
   async function getList() {
-    const result = await chrome?.storage?.local?.get([storageKey]);
-    const list = result?.[storageKey] || [];
+    const result = await baseService.getData();
+    const list = result || [];
     return list;
   }
 
   async function setList(list) {
-    await chrome?.storage?.local?.set({
-      [storageKey]: list,
-    });
+    await baseService.setData(list || []);
   }
 
   async function getById(id) {
@@ -104,9 +116,7 @@ function createBaseListService({ storageKey }) {
     await setList(list);
   }
 
-  const baseService = createBaseService({
-    storageKey,
-  });
+
 
   return {
     ...baseService,

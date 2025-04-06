@@ -1,4 +1,5 @@
 import { BaseHtmlElement } from "../common/BaseElement.js";
+import { editingReplacementService } from "../services/editingReplacement.js";
 
 const replacementItemName = "replacement-item";
 
@@ -7,13 +8,29 @@ window.customElements.define(
   class ReplacementItem extends BaseHtmlElement {
     editing = false;
 
-    setEditing(editing) {
-      this.editing = editing;
+    async setEditing(editing) {
+      let editingData = undefined;
+
+      if (editing) {
+        editingData = {
+          pattern: this.pattern || "",
+          replacement: this.replacement || "",
+          isRegExp: this.isregexp === "true",
+        };
+      }
+
+      await editingReplacementService.set(this.id, editingData);
+    }
+
+    async updateEditingData() {
+      const editingData = await editingReplacementService.get(this.id);
+      this.editingData = editingData;
+      this.editing = Boolean(editingData);
       this.updateView();
     }
 
     static get observedAttributes() {
-      return ["pattern", "replacement", "isregexp", "isnew"];
+      return ["id", "pattern", "replacement", "isregexp", "isnew"];
     }
 
     constructor() {
@@ -21,13 +38,17 @@ window.customElements.define(
 
       this.attributesProps(ReplacementItem.observedAttributes);
       this.eventsProps(["delete"]);
+
+      editingReplacementService.addOnChangeListener(async () => {
+        await this.updateEditingData();
+      });
     }
 
     attributeChangedCallback(...args) {
       const [name] = args;
 
-      if (name === "isnew") {
-        this.editing = this.isnew === "true";
+      if (name === "id") {
+        this.updateEditingData();
       }
 
       super.attributeChangedCallback(...args);
@@ -44,14 +65,33 @@ window.customElements.define(
       };
 
       if (this.editing) {
+        const editingValues = this.editingData || values;
         let form = null;
         const labels = [];
+
+        function getReplacementValue() {
+          const formData = new FormData(form);
+          const values = Object.fromEntries(formData.entries());
+          return {
+            ...values,
+            isRegExp: Boolean(values.isRegExp),
+          };
+        }
+
+        const handleInput = (e) => {
+          e.preventDefault();
+
+          const replacementValue = getReplacementValue();
+          editingReplacementService.set(this.id, replacementValue);
+        };
+
         for (const fieldName of ["pattern", "replacement"]) {
           const input = this.el("input", {
             key: `form-input-${fieldName}`,
             type: "text",
             name: fieldName,
-            value: values[fieldName],
+            value: editingValues[fieldName],
+            oninput: handleInput,
           });
 
           const label = this.el(
@@ -74,7 +114,8 @@ window.customElements.define(
             key: `form-input-${fieldName}`,
             type: "checkbox",
             name: fieldName,
-            checked: values[fieldName],
+            checked: editingValues[fieldName],
+            oninput: handleInput,
           });
 
           const label = this.el(
@@ -98,13 +139,12 @@ window.customElements.define(
           className: "button button--primary",
           onclick: async (e) => {
             e.preventDefault();
-            const formData = new FormData(form);
-            const values = Object.fromEntries(formData.entries());
+            const replacementValue = getReplacementValue();
 
             this.dispatchEvent(
               new CustomEvent("change", {
                 detail: {
-                  values,
+                  values: replacementValue,
                 },
               }),
             );

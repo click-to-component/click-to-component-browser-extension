@@ -4,6 +4,7 @@ import { showPrompt } from "./prompt.js";
 import { showConfirmDialog } from "./confirm-dialog.js";
 import { replacementItemName } from "./replacement-item.js";
 import { showErrorMessage } from "./message.js";
+import { editingReplacementService } from "../services/editingReplacement.js";
 
 const currentConfigName = "current-config";
 
@@ -41,6 +42,7 @@ customElements.define(
         },
         this.el(replacementItemName, {
           key: this.scopeKey("replacement-item"),
+          id: replacement?.id,
           pattern: replacement?.pattern,
           replacement: replacement?.replacement,
           isregexp: replacement?.isRegExp,
@@ -65,6 +67,7 @@ customElements.define(
               id: this.currentConfig.id,
               replacementId: replacement.id,
             });
+            await editingReplacementService.set(replacement.id, undefined);
           },
         }),
       );
@@ -219,13 +222,19 @@ customElements.define(
                     className: "button",
                     onclick: async (e) => {
                       e.preventDefault();
-                      await configListService.addReplacement({
-                        id: this.currentConfig.id,
-                        isRegExp: false,
-                        pattern: "",
-                        replacement: "",
-                        isNew: true,
-                      });
+                      const newReplacement =
+                        await configListService.addReplacement({
+                          id: this.currentConfig.id,
+                          isRegExp: false,
+                          pattern: "",
+                          replacement: "",
+                          isNew: true,
+                        });
+
+                      await editingReplacementService.set(
+                        newReplacement.id,
+                        newReplacement,
+                      );
                     },
                   }),
                 ),

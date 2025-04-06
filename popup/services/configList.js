@@ -115,21 +115,22 @@ function createConfigListService() {
 
     const replacements = item.replacements || [];
 
+    const newReplacement = {
+      id: genId(),
+      isRegExp: Boolean(isRegExp),
+      pattern: pattern || "",
+      replacement: replacement || "",
+      isNew: Boolean(isNew),
+    };
+
     const newItem = {
       ...item,
-      replacements: [
-        ...replacements,
-        {
-          id: genId(),
-          isRegExp: Boolean(isRegExp),
-          pattern: pattern || "",
-          replacement: replacement || "",
-          isNew: Boolean(isNew),
-        },
-      ],
+      replacements: [...replacements, newReplacement],
     };
 
     await baseListService.update(newItem, id);
+
+    return newReplacement;
   }
 
   async function deleteReplacement({ id, replacementId }) {
