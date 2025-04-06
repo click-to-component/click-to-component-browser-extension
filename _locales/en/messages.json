@@ -1,5 +1,5 @@
 {
   "description": {
-    "message": "Click a component in your browser to instantly open the source in VS Code. Support custom config open WebStorm, Cursor, GitHub, etc."
+    "message": "Click a component in your browser to instantly open the source in VS Code. Support custom configuration to open WebStorm, Cursor, GitHub, etc."
   }
 }

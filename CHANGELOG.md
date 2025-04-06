@@ -4,7 +4,7 @@
 
 # v0.0.0.3
 
-- Support custom config open WebStorm, Cursor, GitHub,etc.
+- Support custom configuration to open WebStorm, Cursor, GitHub, etc.
 
 # v0.0.0.2
 
