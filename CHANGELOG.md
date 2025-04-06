@@ -1,3 +1,7 @@
+# v0.0.0.5
+
+- Support save editing replacements.
+
 # v0.0.0.4
 
 - Using module script.
