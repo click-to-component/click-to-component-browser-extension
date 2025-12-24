@@ -33,14 +33,6 @@ body {
   min-height: 500px;
 }
 
-.dialog {
-  border: none;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  width: calc(100% - 2rem);
-  max-width: 360px;
-}
-
 .message-popover {
   all: unset;
   margin: 3rem auto 0 auto;
@@ -49,12 +41,4 @@ body {
   width: fit-content;
   height: fit-content;
   word-break: break-word;
-}
-
-.confirm-dialog {
-  border: none;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  width: calc(100% - 2rem);
-  max-width: 360px;
 }

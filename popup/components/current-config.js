@@ -5,6 +5,7 @@ import { showConfirmDialog } from "./confirm-dialog.js";
 import { replacementItemName } from "./replacement-item.js";
 import { showErrorMessage } from "./message.js";
 import { editingReplacementService } from "../services/editingReplacement.js";
+import { currentConfigService } from "../services/currentConfig.js";
 
 const currentConfigName = "current-config";
 
@@ -15,7 +16,7 @@ customElements.define(
     replacements = [];
 
     async update() {
-      this.currentConfig = await configListService.getCurrent();
+      this.currentConfig = await currentConfigService.getCurrent();
       this.replacements = this.currentConfig?.replacements || [];
       this.updateView();
     }
@@ -27,14 +28,14 @@ customElements.define(
     constructor() {
       super();
 
-      configListService.addOnChangeListener(async () => {
+      currentConfigService.addOnChangeListener(async () => {
         await this.update();
       });
 
       this.init();
     }
 
-    getReplacementItem({ replacement }) {
+    getReplacementItem({ replacement, isBuiltin }) {
       return this.el(
         "li",
         {
@@ -47,6 +48,7 @@ customElements.define(
           replacement: replacement?.replacement,
           isregexp: replacement?.isRegExp,
           isnew: replacement?.isNew,
+          isbuiltin: isBuiltin,
           onchange: async (e) => {
             const { detail } = e;
             const { values } = detail;
@@ -73,7 +75,7 @@ customElements.define(
       );
     }
 
-    getReplacementList() {
+    getReplacementList({ isBuiltin }) {
       const replacements = this.replacements || [];
 
       if (!replacements.length) {
@@ -97,6 +99,7 @@ customElements.define(
             replacement,
             i,
             length: this.replacements.length,
+            isBuiltin,
           });
           configEls.push(configItem);
         });
@@ -186,6 +189,7 @@ customElements.define(
 
     render() {
       const hasCurrentConfig = this.currentConfig?.id;
+      const isBuiltin = this.currentConfig?.isBuiltin;
       return [
         this.el(
           "section",
@@ -210,37 +214,39 @@ customElements.define(
                   key: "list",
                   className: "list",
                 },
-                ...this.getReplacementList(),
-                this.el(
-                  "li",
-                  {
-                    key: "add-replacement-li",
-                  },
-                  this.el("button", {
-                    key: "add-replacement",
-                    innerText: "Add Replacement",
-                    className: "button",
-                    onclick: async (e) => {
-                      e.preventDefault();
-                      const newReplacement =
-                        await configListService.addReplacement({
-                          id: this.currentConfig.id,
-                          isRegExp: false,
-                          pattern: "",
-                          replacement: "",
-                          isNew: true,
-                        });
-
-                      await editingReplacementService.set(
-                        newReplacement.id,
-                        newReplacement,
-                      );
+                ...this.getReplacementList({ isBuiltin }),
+                !isBuiltin &&
+                  this.el(
+                    "li",
+                    {
+                      key: "add-replacement-li",
                     },
-                  }),
-                ),
+                    this.el("button", {
+                      key: "add-replacement",
+                      innerText: "Add Replacement",
+                      className: "button",
+                      onclick: async (e) => {
+                        e.preventDefault();
+                        const newReplacement =
+                          await configListService.addReplacement({
+                            id: this.currentConfig.id,
+                            isRegExp: false,
+                            pattern: "",
+                            replacement: "",
+                            isNew: true,
+                          });
+
+                        await editingReplacementService.set(
+                          newReplacement.id,
+                          newReplacement,
+                        );
+                      },
+                    }),
+                  ),
               ),
             ),
           hasCurrentConfig &&
+            !isBuiltin &&
             this.el(
               "div",
               {

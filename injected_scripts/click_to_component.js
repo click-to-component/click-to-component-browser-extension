@@ -131,7 +131,7 @@ function getUrlByConfig(sourceCodeLocationStr) {
   const config = window.__CLICK_TO_COMPONENT_CONFIG__;
   const configReplacements = config?.replacements;
 
-  if (Array.isArray(configReplacements)) {
+  if (Array.isArray(configReplacements) && configReplacements.length > 0) {
     let result = sourceCodeLocationStr;
 
     for (const configReplacement of configReplacements) {

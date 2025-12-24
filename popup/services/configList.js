@@ -1,13 +1,14 @@
 import { genId } from "../utils.js";
 import { createBaseListService } from "./base.js";
 
+// copy to background/index.js
 const builtinConfigs = [
   {
-    id: "vscode",
+    id: "builtin-vscode",
     name: "VS Code",
     replacements: [
       {
-        id: "vscode-replacement",
+        id: "builtin-vscode-replacement",
         isRegExp: true,
         pattern: "^(.*):(.*):(.*)$",
         replacement: "vscode://file/$1:$2:$3",
@@ -15,11 +16,11 @@ const builtinConfigs = [
     ],
   },
   {
-    id: "webstorm",
+    id: "builtin-webstorm",
     name: "WebStorm",
     replacements: [
       {
-        id: "webstorm-replacement",
+        id: "builtin-webstorm-replacement",
         isRegExp: true,
         pattern: "^(.*):(.*):(.*)$",
         replacement: "webstorm://open?file=$1&line=$2&column=$3",
@@ -27,17 +28,49 @@ const builtinConfigs = [
     ],
   },
   {
-    id: "cursor",
+    id: "builtin-cursor",
     name: "Cursor",
     replacements: [
       {
-        id: "cursor-replacement",
+        id: "builtin-cursor-replacement",
         isRegExp: true,
         pattern: "^(.*):(.*):(.*)$",
         replacement: "cursor://file/$1:$2:$3",
       },
     ],
   },
+  {
+    id: "builtin-trae",
+    name: "TRAE",
+    replacements: [
+      {
+        id: "builtin-trae-replacement",
+        isRegExp: true,
+        pattern: "^(.*):(.*):(.*)$",
+        replacement: "trae://file/$1:$2:$3",
+      },
+    ],
+  },
+  {
+    id: "builtin-trae-cn",
+    name: "TRAE CN",
+    replacements: [
+      {
+        id: "builtin-trae-cn-replacement",
+        isRegExp: true,
+        pattern: "^(.*):(.*):(.*)$",
+        replacement: "trae-cn://file/$1:$2:$3",
+      },
+    ],
+  },
+].map((d) => {
+  return {
+    ...d,
+    isBuiltin: true,
+  };
+});
+
+const initialConfigs = [
   {
     id: "github",
     name: "GitHub",
@@ -78,31 +111,13 @@ function createConfigListService() {
     storageKey,
   });
 
-  async function setCurrent(id) {
+  async function getListWithBuiltin() {
     const list = await baseListService.getList();
-
-    const newList = list.map((item) => {
-      return {
-        ...item,
-        isCurrent: item.id === id,
-      };
-    });
-
-    const result = await baseListService.setList(newList);
-
-    return result;
+    return [...builtinConfigs, ...list];
   }
 
-  async function getCurrent() {
-    const list = await baseListService.getList();
-
-    const item = list.find((d) => d.isCurrent);
-
-    return item;
-  }
-
-  async function setBuiltinConfigs() {
-    const result = await baseListService.setList(builtinConfigs);
+  async function setInitialConfigs() {
+    const result = await baseListService.setList(initialConfigs);
     return result;
   }
 
@@ -184,9 +199,8 @@ function createConfigListService() {
 
   return {
     ...baseListService,
-    setCurrent,
-    getCurrent,
-    setBuiltinConfigs,
+    getListWithBuiltin,
+    setInitialConfigs,
     createNewItem,
     addReplacement,
     deleteReplacement,

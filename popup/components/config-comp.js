@@ -1,10 +1,12 @@
 import { BaseHtmlElement } from "../common/BaseElement.js";
 import { configListService } from "../services/configList.js";
+import { currentConfigService } from "../services/currentConfig.js";
 import { checkHasPermission, getCurrentTab } from "../utils.js";
 import { currentConfigName } from "./current-config.js";
 import { floatingActionButtonName } from "./floating-action-button.js";
 import { showErrorMessage, showSuccessMessage } from "./message.js";
 import { showPrompt } from "./prompt.js";
+import { showConfirmDialog } from "./confirm-dialog.js";
 
 const configComp = "config-comp";
 
@@ -49,18 +51,14 @@ customElements.define(
   configComp,
   class ConfigComp extends BaseHtmlElement {
     configList = [];
+    currentConfig;
     hasPermisssion;
     injectConfigResult;
-    firstInjectConfigResult;
 
     async setInjectConfigResult() {
       this.injectConfigResult = await chrome.runtime.sendMessage({
         action: "getInjectConfigResult",
       });
-
-      if (!this.firstInjectConfigResult) {
-        this.firstInjectConfigResult = this.injectConfigResult;
-      }
     }
 
     async checkPermission() {
@@ -68,16 +66,34 @@ customElements.define(
     }
 
     async update() {
-      this.configList = await configListService.getList();
+      this.configList = await configListService.getListWithBuiltin();
+      this.currentConfig = await currentConfigService.getData();
       this.updateView();
     }
 
-    async setBuiltInConfigsWhenNoConfig() {
+    async setInitialConfigsWhenNoConfig() {
       const list = await configListService.getList();
 
       if (!list.length) {
-        await configListService.setBuiltinConfigs();
+        await configListService.setInitialConfigs();
       }
+    }
+
+    async confirmAlwaysAllowHostPermission() {
+      try {
+        await showConfirmDialog(
+          `Always allow host permission for this site to inject custom config?`,
+          {
+            confirmText: "Allow",
+            confirmClassName: "button--primary",
+          },
+        );
+      } catch {
+        return false;
+      }
+
+      const result = await requestPermission();
+      return result;
     }
 
     async init() {
@@ -94,14 +110,22 @@ customElements.define(
       }
 
       await this.update();
+
+      if (this.hasPermisssion !== true) {
+        this.confirmAlwaysAllowHostPermission();
+      }
     }
 
     constructor() {
       super();
 
-      this.setBuiltInConfigsWhenNoConfig();
+      this.setInitialConfigsWhenNoConfig();
 
       configListService.addOnChangeListener(async () => {
+        await this.update();
+      });
+
+      currentConfigService.addOnChangeListener(async () => {
         await this.update();
       });
 
@@ -121,7 +145,9 @@ customElements.define(
     getConfigItem({ config }) {
       const configKey = config?.key;
       const configName = config?.name || configKey;
-      const selected = config?.isCurrent && this.injectConfigResult?.success;
+      const selected =
+        config?.id === this.currentConfig?.id &&
+        this.injectConfigResult?.success;
 
       return this.el("button", {
         key: this.scopeKey("button"),
@@ -131,7 +157,7 @@ customElements.define(
           try {
             e.preventDefault();
 
-            await configListService.setCurrent(config.id);
+            await currentConfigService.setData({ id: config.id });
 
             chrome.runtime.sendMessage({
               action: "injectConfig",
@@ -149,17 +175,13 @@ customElements.define(
       const configList = this.configList || [];
       const configEls = [];
 
-      let i = 0;
       for (const config of configList) {
         this.withScope(`config-item-${config.id}`, () => {
           const configItem = this.getConfigItem({
             config,
-            i,
-            length: this.configList.length,
           });
           configEls.push(configItem);
         });
-        i++;
       }
 
       return configEls;
@@ -181,24 +203,6 @@ customElements.define(
       );
 
       return [
-        (this.hasPermisssion !== true ||
-          !this.firstInjectConfigResult?.success) &&
-          this.el("button", {
-            key: "request-permission",
-            innerText:
-              "Allow host permission for this site to enable inject config to the current page. (If you did not allow host permission, you will need to click the icon every time.)",
-            className: "button button--primary",
-            style: "width: 100%; text-align: left;",
-            onclick: () => {
-              (async () => {
-                const result = await requestPermission();
-                if (result) {
-                  await this.checkPermission();
-                }
-              })();
-            },
-          }),
-
         this.el(
           "div",
           {

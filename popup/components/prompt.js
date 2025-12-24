@@ -1,3 +1,7 @@
+// "nearest ancestor" does not permit crossing shadow boundaries.
+// Crossing shadow boundaries would require using shadow-including ancestor.
+// See https://github.com/whatwg/html/issues/7971
+
 import { BaseHtmlElement } from "../common/BaseElement.js";
 
 const promptContentName = "prompt-content";
@@ -5,85 +9,117 @@ const promptContentName = "prompt-content";
 window.customElements.define(
   promptContentName,
   class PromptContent extends BaseHtmlElement {
-    inputValue = "";
-
     static get observedAttributes() {
-      return [
-        "content",
-        "confirmText",
-        "cancelText",
-        "confirmClassName",
-        "default-value",
-      ];
+      return ["content", "confirmText", "cancelText", "confirmClassName"];
     }
 
     constructor() {
       super();
       this.attributesProps(PromptContent.observedAttributes);
+      this.isComposing = false;
     }
 
-    attributeChangedCallback(...args) {
-      const [name] = args;
-
-      if (name === "default-value") {
-        this.inputValue = this["default-value"] || "";
-      }
-
-      super.attributeChangedCallback(...args);
+    showModal() {
+      this.dialogEl.showModal();
     }
 
     render() {
-      const container = this.el(
-        "div",
+      const formConfirmEl = this.el("button", {
+        key: "confirm",
+        innerText: this.confirmText || "OK",
+        className: ["button", "button--primary", this.confirmClassName].join(
+          " ",
+        ),
+        formMethod: "dialog",
+        value: "confirm",
+      });
+
+      const dialog = this.el(
+        "dialog",
         {
-          key: "container",
-          className: "container",
-        },
-        this.el("p", {
-          key: "content",
-          innerText: this.content,
-        }),
-        this.el("input", {
-          key: "input",
-          value: this.inputValue,
-          onchange: (e) => {
-            this.inputValue = e.target.value;
-          },
-          onkeyup: (e) => {
-            if (e.key === "Enter") {
-              this.dispatchEvent(new Event("submit"));
+          key: "dialog",
+          className: "dialog",
+          onclose: () => {
+            if (dialog.returnValue === "confirm") {
+              this.dispatchEvent(
+                new CustomEvent("resolve", {
+                  detail: this.inputValue,
+                }),
+              );
+            } else {
+              this.dispatchEvent(
+                new CustomEvent("reject", {
+                  detail: {},
+                }),
+              );
             }
           },
-        }),
+        },
+
         this.el(
-          "form",
+          "div",
           {
-            key: "form",
-            method: "dialog",
+            key: "container",
+            className: "container",
           },
-          this.el("button", {
-            key: "cancel",
-            innerText: this.cancelText || "Cancel",
-            className: "button",
-            value: "cancel",
-            formMethod: "dialog",
+          this.el("p", {
+            key: "content",
+            innerText: this.content,
           }),
-          this.el("button", {
-            key: "confirm",
-            innerText: this.confirmText || "OK",
-            className: [
-              "button",
-              "button--primary",
-              this.confirmClassName,
-            ].join(" "),
-            formMethod: "dialog",
-            value: "confirm",
+          this.el("input", {
+            key: "input",
+            name: "text",
+            onchange: (e) => {
+              this.inputValue = e.target.value;
+            },
+            onkeyup: (e) => {
+              if (e.key === "Enter") {
+                if (this.isComposing) {
+                  this.isComposing = false;
+                  return;
+                }
+
+                formConfirmEl.click();
+              }
+            },
+            effect: (el) => {
+              const abortController = new AbortController();
+              el.addEventListener(
+                "compositionstart",
+                () => {
+                  this.isComposing = true;
+                },
+                abortController.signal,
+              );
+
+              return () => {
+                abortController.abort();
+              };
+            },
           }),
+
+          this.el(
+            "form",
+            {
+              key: "form",
+              method: "dialog",
+            },
+            this.el("button", {
+              key: "cancel",
+              innerText: this.cancelText || "Cancel",
+              className: "button",
+              value: "cancel",
+              formMethod: "dialog",
+            }),
+            formConfirmEl,
+          ),
         ),
       );
 
+      this.dialogEl = dialog;
+
       return [
-        container,
+        dialog,
         this.el("style", {
           key: "style",
           textContent: `
@@ -111,39 +147,23 @@ window.customElements.define(
 );
 
 async function showPrompt(content, config) {
-  const { confirmText, cancelText, confirmClassName, defaultValue } =
-    config || {};
+  const { confirmText, cancelText, confirmClassName } = config || {};
 
   const { promise, resolve } = Promise.withResolvers();
-  const confirmDialogContent = document.createElement(promptContentName);
-  confirmDialogContent.content = content;
-  confirmDialogContent.confirmText = confirmText;
-  confirmDialogContent.cancelText = cancelText;
-  confirmDialogContent.confirmClassName = confirmClassName;
-  confirmDialogContent["default-value"] = defaultValue;
-  confirmDialogContent.onsubmit = (e) => {
-    e.preventDefault();
-
-    resolve([true, confirmDialogContent.inputValue]);
-
-    dialog.close();
-  };
-
-  const dialog = document.createElement("dialog");
-  dialog.className = "dialog";
-  dialog.appendChild(confirmDialogContent);
-  dialog.addEventListener("close", () => {
-    if (dialog.returnValue === "confirm") {
-      resolve([true, confirmDialogContent.inputValue]);
-    } else {
-      resolve([false]);
-    }
-
-    dialog.remove();
+  const confirmDialog = document.createElement(promptContentName);
+  confirmDialog.content = content;
+  confirmDialog.confirmText = confirmText;
+  confirmDialog.cancelText = cancelText;
+  confirmDialog.confirmClassName = confirmClassName;
+  confirmDialog.addEventListener("resolve", (e) => {
+    resolve([true, e.detail]);
+  });
+  confirmDialog.addEventListener("reject", () => {
+    resolve([false]);
   });
 
-  document.body.appendChild(dialog);
-  dialog.showModal();
+  document.body.appendChild(confirmDialog);
+  confirmDialog.showModal();
 
   return promise;
 }

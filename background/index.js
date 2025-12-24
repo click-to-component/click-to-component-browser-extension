@@ -1,4 +1,74 @@
-const storageKey = "configList";
+const configListStorageKey = "configList";
+const currentConfigStorageKey = "currentConfig";
+
+// copy from popup/services/configList.js
+const builtinConfigs = [
+  {
+    id: "builtin-vscode",
+    name: "VS Code",
+    replacements: [
+      {
+        id: "builtin-vscode-replacement",
+        isRegExp: true,
+        pattern: "^(.*):(.*):(.*)$",
+        replacement: "vscode://file/$1:$2:$3",
+      },
+    ],
+  },
+  {
+    id: "builtin-webstorm",
+    name: "WebStorm",
+    replacements: [
+      {
+        id: "builtin-webstorm-replacement",
+        isRegExp: true,
+        pattern: "^(.*):(.*):(.*)$",
+        replacement: "webstorm://open?file=$1&line=$2&column=$3",
+      },
+    ],
+  },
+  {
+    id: "builtin-cursor",
+    name: "Cursor",
+    replacements: [
+      {
+        id: "builtin-cursor-replacement",
+        isRegExp: true,
+        pattern: "^(.*):(.*):(.*)$",
+        replacement: "cursor://file/$1:$2:$3",
+      },
+    ],
+  },
+  {
+    id: "builtin-trae",
+    name: "TRAE",
+    replacements: [
+      {
+        id: "builtin-trae-replacement",
+        isRegExp: true,
+        pattern: "^(.*):(.*):(.*)$",
+        replacement: "trae://file/$1:$2:$3",
+      },
+    ],
+  },
+  {
+    id: "builtin-trae-cn",
+    name: "TRAE CN",
+    replacements: [
+      {
+        id: "builtin-trae-cn-replacement",
+        isRegExp: true,
+        pattern: "^(.*):(.*):(.*)$",
+        replacement: "trae-cn://file/$1:$2:$3",
+      },
+    ],
+  },
+].map((d) => {
+  return {
+    ...d,
+    isBuiltin: true,
+  };
+});
 
 let injectConfigResult = {};
 
@@ -13,15 +83,22 @@ async function getCurrentTab() {
 }
 
 async function getConfigList() {
-  const result = await chrome?.storage?.local?.get([storageKey]);
-  const list = result?.[storageKey] || [];
-  return list;
+  const result = await chrome?.storage?.local?.get([configListStorageKey]);
+  const list = result?.[configListStorageKey] || [];
+  return [...builtinConfigs, list];
+}
+
+async function getCurrentConfigInfo() {
+  const result = await chrome?.storage?.local?.get([currentConfigStorageKey]);
+  const config = result?.[currentConfigStorageKey] || {};
+  return config;
 }
 
 async function getCurrentConfig() {
   const list = await getConfigList();
+  const currentConfigInfo = await getCurrentConfigInfo();
 
-  const item = list.find((d) => d.isCurrent);
+  const item = list.find((d) => d?.id === currentConfigInfo?.id);
 
   return item;
 }

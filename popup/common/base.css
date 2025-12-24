@@ -266,3 +266,11 @@ hr {
   flex-direction: column;
   gap: 0.5rem;
 }
+
+.dialog {
+  border: none;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  width: calc(100% - 2rem);
+  max-width: 360px;
+}

@@ -30,7 +30,7 @@ window.customElements.define(
     }
 
     static get observedAttributes() {
-      return ["id", "pattern", "replacement", "isregexp", "isnew"];
+      return ["id", "pattern", "replacement", "isregexp", "isnew", "isbuiltin"];
     }
 
     constructor() {
@@ -64,7 +64,7 @@ window.customElements.define(
         isRegExp,
       };
 
-      if (this.editing) {
+      if (this.editing && !this.isbuiltin) {
         const editingValues = this.editingData || values;
         let form = null;
         const labels = [];
@@ -202,36 +202,38 @@ window.customElements.define(
           innerText: `replace(${isRegExp ? "new RegExp(" : ""}${JSON.stringify(pattern)}${isRegExp ? ")" : ""}, ${JSON.stringify(replacement)})`,
         }),
 
-        this.el(
-          "button",
-          {
-            key: "edit",
-            className: "text-button hover-show-action",
-            onclick: async () => {
-              this.setEditing(true);
+        !this.isbuiltin &&
+          this.el(
+            "button",
+            {
+              key: "edit",
+              className: "text-button hover-show-action",
+              onclick: async () => {
+                this.setEditing(true);
+              },
             },
-          },
-          this.el("i", {
-            key: "edit-icon",
-            className: ["fa-solid", "fa-pen"].join(" "),
-          }),
-        ),
+            this.el("i", {
+              key: "edit-icon",
+              className: ["fa-solid", "fa-pen"].join(" "),
+            }),
+          ),
 
-        this.el(
-          "button",
-          {
-            key: "delete",
-            className: "text-button hover-show-action",
-            onclick: async (e) => {
-              e.preventDefault();
-              this.dispatchEvent(new CustomEvent("delete", {}));
+        !this.isbuiltin &&
+          this.el(
+            "button",
+            {
+              key: "delete",
+              className: "text-button hover-show-action",
+              onclick: async (e) => {
+                e.preventDefault();
+                this.dispatchEvent(new CustomEvent("delete", {}));
+              },
             },
-          },
-          this.el("i", {
-            key: "delete-icon",
-            className: ["fa-solid", "fa-trash"].join(" "),
-          }),
-        ),
+            this.el("i", {
+              key: "delete-icon",
+              className: ["fa-solid", "fa-trash"].join(" "),
+            }),
+          ),
       );
     }
 
