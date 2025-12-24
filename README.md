@@ -8,7 +8,7 @@ Option+Click(Alt+Click) a component in your browser to instantly open the source
 
 1. Option+Click(Alt+Click) a component in your browser to instantly open the source in VS Code.
 2. Option+RightClick(Alt+RightClick) opens a context menu with the parent components.
-3. Support custom configuration to open WebStorm, Cursor, GitHub, etc.
+3. Support custom configuration to open WebStorm, Cursor, TRAE, TRAE CN, GitHub, etc.
 4. Support `data-__source-code-location`
    - Vue using [vue-click-to-component](https://www.npmjs.com/package/vue-click-to-component) generate.
    - React using [babel-plugin-transform-react-jsx-data-source-code-location](https://www.npmjs.com/package/babel-plugin-transform-react-jsx-data-source-code-location) generate.

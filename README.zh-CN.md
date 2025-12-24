@@ -8,7 +8,7 @@
 
 1. 在浏览器中按住 Option(Alt) 点击组件，立即在编辑器中打开对应代码；
 2. 在浏览器中按住 Option(Alt) 右键点击组件，展示包含当前组件和父组件的列表；
-3. 支持自定义配置打开 WebStorm、Cursor、GitHub 等；
+3. 支持自定义配置打开 WebStorm、Cursor、GitHub、TRAE、TRAE CN 等；
 4. 支持 `data-__source-code-location`；
    - Vue 使用 [vue-click-to-component](https://www.npmjs.com/package/vue-click-to-component) 生成。
    - React 使用 [babel-plugin-transform-react-jsx-data-source-code-location](https://www.npmjs.com/package/babel-plugin-transform-react-jsx-data-source-code-location) 生成。
