@@ -1,3 +1,7 @@
+# v0.0.0.6
+
+- Add TRAE builtin config.
+
 # v0.0.0.5
 
 - Support save editing replacements.
