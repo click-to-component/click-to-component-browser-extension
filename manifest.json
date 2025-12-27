@@ -20,7 +20,7 @@
   "background": {
     "service_worker": "background/index.js"
   },
-  "permissions": ["scripting", "activeTab", "storage"],
+  "permissions": ["scripting", "activeTab", "storage", "tabs"],
   "optional_host_permissions": ["<all_urls>"],
   "web_accessible_resources": [
     {

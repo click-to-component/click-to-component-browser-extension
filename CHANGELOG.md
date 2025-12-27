@@ -1,3 +1,7 @@
+# v0.0.0.7
+
+- Fix inject config not working in new page.
+
 # v0.0.0.6
 
 - Add TRAE builtin config.

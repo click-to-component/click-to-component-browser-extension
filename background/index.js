@@ -85,7 +85,7 @@ async function getCurrentTab() {
 async function getConfigList() {
   const result = await chrome?.storage?.local?.get([configListStorageKey]);
   const list = result?.[configListStorageKey] || [];
-  return [...builtinConfigs, list];
+  return [...builtinConfigs, ...list];
 }
 
 async function getCurrentConfigInfo() {
@@ -103,14 +103,7 @@ async function getCurrentConfig() {
   return item;
 }
 
-async function injectConfig() {
-  const tab = await getCurrentTab();
-  const tabId = tab?.id;
-
-  if (!tabId) {
-    return;
-  }
-
+async function injectConfig(tabId) {
   const currentConfig = await getCurrentConfig();
 
   const replacements = currentConfig?.replacements || [];
@@ -153,9 +146,26 @@ async function injectConfig() {
   chrome.runtime.sendMessage({ action: "injectConfigChange" });
 }
 
+async function injectConfigToCurrentTab() {
+  const tab = await getCurrentTab();
+  const tabId = tab?.id;
+
+  if (!tabId) {
+    return;
+  }
+
+  injectConfig(tabId);
+}
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+  if (changeInfo.status === "complete") {
+    injectConfig(tabId);
+  }
+});
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "injectConfig") {
-    injectConfig();
+    injectConfigToCurrentTab();
   } else if (message.action === "getInjectConfigResult") {
     sendResponse(injectConfigResult);
   }

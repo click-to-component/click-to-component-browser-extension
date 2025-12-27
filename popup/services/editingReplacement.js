@@ -14,7 +14,7 @@ function createEditingReplacementService() {
   }
 
   async function get(id) {
-    const data = await baseService.getData();
+    const data = await getData();
 
     return data[id];
   }
